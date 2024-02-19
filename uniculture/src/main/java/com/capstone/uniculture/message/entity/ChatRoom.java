@@ -1,6 +1,6 @@
 package com.capstone.uniculture.message.entity;
 
-import com.capstone.uniculture.entity.Member;
+import com.capstone.uniculture.entity.Member.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +18,11 @@ public class ChatRoom {
   private String name;
 
   @ManyToMany   //사용자 테이블에 채팅방 추가해야함 (mappedBy = "chatRooms");
+  @JoinTable(
+      name = "chat_room_member",
+      joinColumns = @JoinColumn(name = "chat_room_id"),
+      inverseJoinColumns = @JoinColumn(name = "member_id")
+  )
   private Set<Member> members = new HashSet<>();
 
   @OneToMany(mappedBy = "chatRoom")

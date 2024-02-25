@@ -12,9 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ChatMessageDTO {
-
   private MessageType type;
-  private String roomId;
+  private Long roomId;
   private String sender;
   private String message;
   private LocalDateTime time; //채팅 발송 시간

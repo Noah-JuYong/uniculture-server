@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -14,22 +16,35 @@ import java.util.*;
 @NoArgsConstructor
 public class ChatRoom {
   @Id
-  private String roomId;
-  private String name;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-  @ManyToMany   //사용자 테이블에 채팅방 추가해야함 (mappedBy = "chatRooms");
-  @JoinTable(
-      name = "chat_room_member",
-      joinColumns = @JoinColumn(name = "chat_room_id"),
-      inverseJoinColumns = @JoinColumn(name = "member_id")
-  )
-  private Set<Member> members = new HashSet<>();
+  private String name;
+  private String nickname;
+
+  @OneToMany(mappedBy = "chatRoom")
+  private List<ChatRoomMembership> memberships = new ArrayList<>();
 
   @OneToMany(mappedBy = "chatRoom")
   private List<ChatMessage> messages = new ArrayList<>();
 
-  public ChatRoom(String name){
-    this.name = name;
-    this.roomId = UUID.randomUUID().toString();
+  public ChatRoom(String name, List<Member> members){
+    this.name = uniqueName(name, members);
+    this.nickname = members.stream()
+            .map(Member::getNickname)
+            .collect(Collectors.joining(", "));
+
+  }
+
+  private String uniqueName(String baseName, List<Member> members) {      //채팅방의 이름을 구별할 수 있도록 사용자들의 첫번째 이름과 방이 생성된 날짜로 구분.
+    String memberInitials = members.stream()
+            .map(member -> member.getNickname().substring(0, 1)).collect(Collectors.joining());
+    String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+    return baseName + "_" + memberInitials + "_" + timestamp;
+  }
+
+  public void addMember(Member member){
+    ChatRoomMembership membership = new ChatRoomMembership(this, member);
+    memberships.add(membership);
   }
 }

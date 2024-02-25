@@ -7,8 +7,9 @@ import java.util.UUID;
 
 @Data
 public class ChatRoomDTO {
-
-  private String roomId;
+  private long id;
   private String name;
-
+  private String nickname;
+  private String lastestMessage;
+  private int memberCount;
 }
